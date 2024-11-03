@@ -11,7 +11,7 @@ namespace ChroMapper_PrecisionStepAdditions.Configuration
         private static Options instance;
         public static readonly string settingJsonFile = Application.persistentDataPath + "/ChroMapper-PrecisionStepAdditions.json";
 
-        //public float option = 0.5f;  //メンバ変数がオプション値となる [Array、List、Dictionary等は非対応]  Options.Instance.option で読み書きする
+        public int cursorPrecisionC = 16;  //メンバ変数がオプション値となる [Array、List、Dictionary等は非対応]  Options.Instance.option で読み書きする
 
         public static Options Instance
         {
