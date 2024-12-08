@@ -58,6 +58,7 @@ namespace ChroMapper_PrecisionStepAdditions
         }
         private void OnDestroy()
         {
+            this.thirdDisplay.onSelect.RemoveAllListeners();
             Options.Instance.SettingSave();
         }
     }
