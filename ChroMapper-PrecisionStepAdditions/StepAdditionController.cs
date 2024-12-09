@@ -31,10 +31,10 @@ namespace ChroMapper_PrecisionStepAdditions
 
             // Third Intervalの作成
             var secondInterval = this.transform.Find("Second Interval");
-            var thirdDInterval = Instantiate(secondInterval, this.transform);
-            thirdDInterval.name = "Third Interval";
-            this.thirdDisplay = thirdDInterval.GetComponent<TMP_InputField>();
-            this.thirdOutline = thirdDInterval.Find("Background").GetComponent<Outline>();
+            var thirdInterval = Instantiate(secondInterval, this.transform);
+            thirdInterval.name = "Third Interval";
+            this.thirdDisplay = thirdInterval.GetComponent<TMP_InputField>();
+            this.thirdOutline = thirdInterval.Find("Background").GetComponent<Outline>();
             for (int i = 0; i < this.thirdDisplay.onSelect.GetPersistentEventCount(); i++)
             {
                 //https://docs.unity3d.com/ja/2018.4/ScriptReference/UI.InputField.SubmitEvent.html
