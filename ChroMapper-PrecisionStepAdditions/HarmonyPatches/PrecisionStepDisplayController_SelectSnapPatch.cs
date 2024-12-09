@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using ChroMapper_PrecisionStepAdditions.Configuration;
+using HarmonyLib;
 
 namespace ChroMapper_PrecisionStepAdditions.HarmonyPatches
 {
@@ -9,7 +10,8 @@ namespace ChroMapper_PrecisionStepAdditions.HarmonyPatches
         {
             if (!Plugin.stepAdditionController.init)
                 return false;
-            Plugin.stepAdditionController.thirdOutline.effectColor = Plugin.stepAdditionController.defaultOutlineColor;
+            for (int i = 0; i < Options.Instance.additionalStep; i++)
+                Plugin.stepAdditionController.additionalOutline[i].effectColor = Plugin.stepAdditionController.defaultOutlineColor;
             if (first)
                 Plugin.stepAdditionController.currentStep = 0;
             else

@@ -4,6 +4,7 @@ using UnityEngine.Events;
 using TMPro;
 using HarmonyLib;
 using ChroMapper_PrecisionStepAdditions.Configuration;
+using System.Collections.Generic;
 
 namespace ChroMapper_PrecisionStepAdditions
 {
@@ -15,8 +16,8 @@ namespace ChroMapper_PrecisionStepAdditions
         private Outline secondOutline;
         private Color selectedOutlineColor;
         public Color defaultOutlineColor { get; set; }
-        public TMP_InputField thirdDisplay { get; set; }
-        public Outline thirdOutline { get; set; }
+        public List<TMP_InputField> additionalDisplay { get; set; } = new List<TMP_InputField>();
+        public List<Outline> additionalOutline { get; set; } = new List<Outline>();
         public int currentStep { set; get; } = 0;
         public bool init { get; set; } = false;
         private void Start()
@@ -28,37 +29,108 @@ namespace ChroMapper_PrecisionStepAdditions
             this.secondOutline = psdcTraverse.Field("secondOutline").GetValue<Outline>();
             this.selectedOutlineColor = psdcTraverse.Field("selectedOutlineColor").GetValue<Color>();
             this.defaultOutlineColor = psdcTraverse.Field("defaultOutlineColor").GetValue<Color>();
-
-            // Third Intervalの作成
-            var secondInterval = this.transform.Find("Second Interval");
-            var thirdDInterval = Instantiate(secondInterval, this.transform);
-            thirdDInterval.name = "Third Interval";
-            this.thirdDisplay = thirdDInterval.GetComponent<TMP_InputField>();
-            this.thirdOutline = thirdDInterval.Find("Background").GetComponent<Outline>();
-            for (int i = 0; i < this.thirdDisplay.onSelect.GetPersistentEventCount(); i++)
-            {
-                //https://docs.unity3d.com/ja/2018.4/ScriptReference/UI.InputField.SubmitEvent.html
-                if (this.thirdDisplay.onSelect.GetPersistentMethodName(i) == "SelectSnap")
-                    this.thirdDisplay.onSelect.SetPersistentListenerState(i, UnityEventCallState.Off);
-            }
-            this.thirdDisplay.onSelect.AddListener((s) => this.ThirdStep());
-
-            this.thirdDisplay.text = Options.Instance.cursorPrecisionC.ToString();
+            if (Options.Instance.additionalStep > 3)
+                Options.Instance.additionalStep = 3;
+            if (Options.Instance.additionalStep < 0)
+                Options.Instance.additionalStep = 0;
+            this.additionalUI();
             this.init = true;
             this.precisionStepDisplayController.SelectSnap(true);
         }
+
+        private void additionalUI()
+        {
+            var secondInterval = this.secondOutline.transform.parent;
+            var size = secondInterval.GetComponent<RectTransform>().sizeDelta;
+            if (Options.Instance.additionalStep >= 1)
+            {
+                if (Options.Instance.additionalStep == 1)
+                    size.y = 13f;
+                else if (Options.Instance.additionalStep == 2)
+                    size.y = 9f;
+                else if (Options.Instance.additionalStep == 3)
+                    size.y = 7f;
+                this.firstOutline.transform.parent.GetComponent<RectTransform>().sizeDelta = size;
+                secondInterval.GetComponent<RectTransform>().sizeDelta = size;
+            }
+            for (int j = 0; j < Options.Instance.additionalStep; j++)
+            {
+                // Third Intervalの作成
+                var additionalInterval = Instantiate(secondInterval, this.transform);
+                additionalInterval.name = $"Interval{j + 3}";
+                additionalInterval.GetComponent<RectTransform>().sizeDelta = size;
+                this.additionalDisplay.Add(additionalInterval.GetComponent<TMP_InputField>());
+                this.additionalOutline.Add(additionalInterval.Find("Background").GetComponent<Outline>());
+                for (int i = 0; i < this.additionalDisplay[j].onSelect.GetPersistentEventCount(); i++)
+                {
+                    //https://docs.unity3d.com/ja/2018.4/ScriptReference/UI.InputField.SubmitEvent.html
+                    if (this.additionalDisplay[j].onSelect.GetPersistentMethodName(i) == "SelectSnap")
+                        this.additionalDisplay[j].onSelect.SetPersistentListenerState(i, UnityEventCallState.Off);
+                }
+                switch (j)
+                {
+                    case 0:
+                        this.additionalDisplay[j].onSelect.AddListener((s) => this.ThirdStep());
+                        this.additionalDisplay[j].text = Options.Instance.cursorPrecisionC.ToString();
+                        break;
+                    case 1:
+                        this.additionalDisplay[j].onSelect.AddListener((s) => this.FourthStep());
+                        this.additionalDisplay[j].text = Options.Instance.cursorPrecisionD.ToString();
+                        break;
+                    case 2:
+                        this.additionalDisplay[j].onSelect.AddListener((s) => this.FifthStep());
+                        this.additionalDisplay[j].text = Options.Instance.cursorPrecisionE.ToString();
+                        break;
+                }
+            }
+        }
+
         public void ThirdStep()
         {
-            this.firstActive.SetValue(false);
+            this.AdditionalSet();
             this.currentStep = 2;
+            if (Options.Instance.additionalStep > 0)
+                this.additionalOutline[0].effectColor = this.selectedOutlineColor;
+            if (Options.Instance.additionalStep > 1)
+                this.additionalOutline[1].effectColor = this.defaultOutlineColor;
+            if (Options.Instance.additionalStep > 2)
+                this.additionalOutline[2].effectColor = this.defaultOutlineColor;
+            this.precisionStepDisplayController.UpdateManualPrecisionStep(this.additionalDisplay[0].text);
+        }
+        public void FourthStep()
+        {
+            this.AdditionalSet();
+            this.currentStep = 3;
+            if (Options.Instance.additionalStep > 0)
+                this.additionalOutline[0].effectColor = this.defaultOutlineColor;
+            if (Options.Instance.additionalStep > 1)
+                this.additionalOutline[1].effectColor = this.selectedOutlineColor;
+            if (Options.Instance.additionalStep > 2)
+                this.additionalOutline[2].effectColor = this.defaultOutlineColor;
+            this.precisionStepDisplayController.UpdateManualPrecisionStep(this.additionalDisplay[1].text);
+        }
+        public void FifthStep()
+        {
+            this.AdditionalSet();
+            this.currentStep = 4;
+            if (Options.Instance.additionalStep > 0)
+                this.additionalOutline[0].effectColor = this.defaultOutlineColor;
+            if (Options.Instance.additionalStep > 1)
+                this.additionalOutline[1].effectColor = this.defaultOutlineColor;
+            if (Options.Instance.additionalStep > 2)
+                this.additionalOutline[2].effectColor = this.selectedOutlineColor;
+            this.precisionStepDisplayController.UpdateManualPrecisionStep(this.additionalDisplay[2].text);
+        }
+        private void AdditionalSet()
+        {
+            this.firstActive.SetValue(false);
             this.firstOutline.effectColor = this.defaultOutlineColor;
             this.secondOutline.effectColor = this.defaultOutlineColor;
-            this.thirdOutline.effectColor = this.selectedOutlineColor;
-            this.precisionStepDisplayController.UpdateManualPrecisionStep(this.thirdDisplay.text);
         }
         private void OnDestroy()
         {
-            this.thirdDisplay.onSelect.RemoveAllListeners();
+            for (int i = 0; i < Options.Instance.additionalStep; i++)
+                this.additionalDisplay[i].onSelect.RemoveAllListeners();
             Options.Instance.SettingSave();
         }
     }

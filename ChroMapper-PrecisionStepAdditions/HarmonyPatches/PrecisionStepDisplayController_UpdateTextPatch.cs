@@ -8,10 +8,22 @@ namespace ChroMapper_PrecisionStepAdditions.HarmonyPatches
     {
         public static bool Prefix(int newSnapping)
         {
-            if (Plugin.stepAdditionController.currentStep == 2)
+            var currentStep = Plugin.stepAdditionController.currentStep;
+            if (currentStep >= 2)
             {
-                Options.Instance.cursorPrecisionC = newSnapping;
-                Plugin.stepAdditionController.thirdDisplay.text = newSnapping.ToString();
+                switch (currentStep)
+                {
+                    case 2:
+                        Options.Instance.cursorPrecisionC = newSnapping;
+                        break;
+                    case 3:
+                        Options.Instance.cursorPrecisionD = newSnapping;
+                        break;
+                    case 4:
+                        Options.Instance.cursorPrecisionE = newSnapping;
+                        break;
+                }
+                Plugin.stepAdditionController.additionalDisplay[currentStep - 2].text = newSnapping.ToString();
                 return false;
             }
             return true;
