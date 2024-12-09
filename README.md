@@ -46,3 +46,17 @@ The configuration file is saved in `PrecisionStepAdditions.json` in the same fol
 | cursorPrecisionC | 16 | 3個目の移動単位の分母<br>Third cursor interval precision |
 | cursorPrecisionD | 24 | 4個目の移動単位の分母<br>Fourth cursor interval precision |
 | cursorPrecisionE | 32 | 5個目の移動単位の分母<br>Fifth cursor interval precision |
+
+# 開発者情報 (Developers)
+このプロジェクトをビルドするには、ChroMapperのインストールパスを指定する`ChroMapper-PrecisionStepAdditions\ChroMapper-PrecisionStepAdditions.csproj.user`ファイルを作成する必要があります。
+
+To build this project, you must create a `ChroMapper-PrecisionStepAdditions\ChroMapper-PrecisionStepAdditions.csproj.user` file that specifies the ChroMapper installation path.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ChroMapperDir>C:\TOOL\ChroMapper\chromapper</ChroMapperDir>
+  </PropertyGroup>
+</Project>
+```
